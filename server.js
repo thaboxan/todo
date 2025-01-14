@@ -1,63 +1,82 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const { MongoClient, ServerApiVersion } = require("mongodb");
-const uri =
-  "mongodb+srv://admin:admin@cluster0.wzrlz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const express = require('express');
+const mongoose = require('mongoose');
+const path = require('path');
+require('dotenv').config();
+
 const app = express();
-const port = 3000;
+const port = 3001;
 
-app.use(bodyParser.json());
+// Middleware
+app.use(express.json());
+app.use(express.static('public'));
 
-let todos = [];
+// MongoDB Connection
+mongoose.connect(process.env.MONGODB_URI)
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(err => console.error('MongoDB connection error:', err));
 
-// Root URL route
-app.get("/", (req, res) => {
-  res.send("Welcome to the Todo API, my name is Thabo");
+// Todo Model
+const todoSchema = new mongoose.Schema({
+    text: {
+        type: String,
+        required: true
+    },
+    completed: {
+        type: Boolean,
+        default: false
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
 });
 
-// Get all todos
-app.get("/todos", (req, res) => {
-  res.json(todos);
+const Todo = mongoose.model('Todo', todoSchema);
+
+// API Routes
+app.get('/api/todos', async (req, res) => {
+    try {
+        const todos = await Todo.find().sort({ createdAt: -1 });
+        res.json(todos);
+    } catch (error) {
+        res.status(500).json({ error: 'Error fetching todos' });
+    }
 });
 
-// Add a new todo
-app.post("/todos", (req, res) => {
-  const todo = req.body;
-  todos.push(todo);
-  res.status(201).json(todo);
+app.post('/api/todos', async (req, res) => {
+    try {
+        const newTodo = new Todo({
+            text: req.body.text
+        });
+        const savedTodo = await newTodo.save();
+        res.status(201).json(savedTodo);
+    } catch (error) {
+        res.status(500).json({ error: 'Error creating todo' });
+    }
 });
 
-// Delete a todo
-app.delete("/todos/:id", (req, res) => {
-  const id = parseInt(req.params.id, 10);
-  todos = todos.filter((todo) => todo.id !== id);
-  res.status(204).send();
+app.put('/api/todos/:id', async (req, res) => {
+    try {
+        const updatedTodo = await Todo.findByIdAndUpdate(
+            req.params.id,
+            { completed: req.body.completed },
+            { new: true }
+        );
+        res.json(updatedTodo);
+    } catch (error) {
+        res.status(500).json({ error: 'Error updating todo' });
+    }
+});
+
+app.delete('/api/todos/:id', async (req, res) => {
+    try {
+        await Todo.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Todo deleted' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error deleting todo' });
+    }
 });
 
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+    console.log(`Server running at http://localhost:${port}`);
 });
-
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  },
-});
-async function run() {
-  try {
-    // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
-  } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
-  }
-}
-run().catch(console.dir);
