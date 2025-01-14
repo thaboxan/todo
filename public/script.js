@@ -1,141 +1,78 @@
-
-
 class TodoList {
     constructor() {
+        // Initialize the todo list and other DOM elements
         this.todos = [];
-        this.loadTodos();
-        this.setupEventListeners();
+        this.loadTodos(); // Load todos from the server
+        this.setupEventListeners(); // Set up form and other event listeners
     }
 
+    // Load todos from the API and render them
     async loadTodos() {
         try {
-            const response = await fetch('/api/todos');            class TodoList {
-                constructor() {
-                    if (TodoList.instance) {
-                        return TodoList.instance;
-                    }
-                    TodoList.instance = this;
-                    
-                    this.todos = [];
-                    this.form = document.getElementById('todoForm');                    class TodoList {
-                        constructor() {
-                            if (TodoList.instance) {
-                                return TodoList.instance;
-                            }
-                            TodoList.instance = this;
-                            
-                            this.todos = [];
-                            this.form = document.getElementById('todoForm');
-                            this.input = document.getElementById('todoInput');
-                            this.list = document.getElementById('todoList');
-                            this.timeDisplay = document.getElementById('timeDisplay');
-                            
-                            this.loadTodos();
-                            this.setupEventListeners();
-                            this.startClock();
-                        }
-                    
-                        startClock() {
-                            const updateTime = () => {
-                                const now = new Date();
-                                const timeString = now.toLocaleTimeString('en-US', { 
-                                    hour: '2-digit', 
-                                    minute: '2-digit',
-                                    second: '2-digit'
-                                });
-                                this.timeDisplay.textContent = timeString;
-                            };
-                            
-                            updateTime();
-                            setInterval(updateTime, 1000);
-                        }
-                    
-                        // ...existing code...
-                    }
-                    this.input = document.getElementById('todoInput');
-                    this.list = document.getElementById('todoList');
-                    
-                    this.loadTodos();
-                    this.setupEventListeners();
-                }
-            
-                setupEventListeners() {
-                    // Remove existing listeners first
-                    this.form.replaceWith(this.form.cloneNode(true));
-                    this.form = document.getElementById('todoForm');
-                    
-                    this.form.addEventListener('submit', (e) => {
-                        e.preventDefault();
-                        const text = this.input.value.trim();
-                        if (text) {
-                            this.addTodo(text);
-                            this.input.value = '';
-                        }
-                    });
-                }
-            
-                // ...existing code...
-            }
-            
-            // Single initialization
-            window.todoList = window.todoList || new TodoList();
-            this.todos = await response.json();
-            this.renderTodos();
+            const response = await fetch('/api/todos'); // Fetch todos from the server
+            this.todos = await response.json(); // Parse the response into JSON format
+            this.renderTodos(); // Render the todos on the page
         } catch (error) {
-            console.error('Error loading todos:', error);
+            console.error('Error loading todos:', error); // Log errors, if any
         }
     }
 
+    // Add a new todo item
     async addTodo(text) {
         try {
             const response = await fetch('/api/todos', {
-                method: 'POST',
+                method: 'POST', // Send a POST request to add a new todo
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json' // Specify JSON content type
                 },
-                body: JSON.stringify({ text })
+                body: JSON.stringify({ text }) // Send the new todo's text
             });
-            const newTodo = await response.json();
-            this.todos.unshift(newTodo);
-            this.renderTodos();
+            const newTodo = await response.json(); // Parse the response into JSON
+            this.todos.unshift(newTodo); // Add the new todo to the beginning of the list
+            this.renderTodos(); // Re-render the todos
         } catch (error) {
-            console.error('Error adding todo:', error);
+            console.error('Error adding todo:', error); // Log errors, if any
         }
     }
 
+    // Toggle the completed status of a todo
     async toggleTodo(id, completed) {
         try {
             const response = await fetch(`/api/todos/${id}`, {
-                method: 'PUT',
+                method: 'PUT', // Send a PUT request to update the todo
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json' // Specify JSON content type
                 },
-                body: JSON.stringify({ completed })
+                body: JSON.stringify({ completed }) // Send the updated completed status
             });
-            const updatedTodo = await response.json();
+            const updatedTodo = await response.json(); // Parse the response into JSON
+            // Update the todo in the local array
             this.todos = this.todos.map(todo => 
                 todo._id === id ? updatedTodo : todo
             );
-            this.renderTodos();
+            this.renderTodos(); // Re-render the todos
         } catch (error) {
-            console.error('Error updating todo:', error);
+            console.error('Error updating todo:', error); // Log errors, if any
         }
     }
 
+    // Delete a todo item
     async deleteTodo(id) {
         try {
             await fetch(`/api/todos/${id}`, {
-                method: 'DELETE'
+                method: 'DELETE' // Send a DELETE request to remove the todo
             });
+            // Remove the deleted todo from the local array
             this.todos = this.todos.filter(todo => todo._id !== id);
-            this.renderTodos();
+            this.renderTodos(); // Re-render the todos
         } catch (error) {
-            console.error('Error deleting todo:', error);
+            console.error('Error deleting todo:', error); // Log errors, if any
         }
     }
 
+    // Render the todos on the page
     renderTodos() {
-        const todoList = document.getElementById('todoList');
+        const todoList = document.getElementById('todoList'); // Get the todo list container
         todoList.innerHTML = this.todos
             .map(todo => `
                 <li class="todo-item ${todo.completed ? 'completed' : ''}">
@@ -145,17 +82,18 @@ class TodoList {
                     <span>${todo.text}</span>
                     <button onclick="todoList.deleteTodo('${todo._id}')">Delete</button>
                 </li>
-            `).join('');
+            `).join(''); // Generate HTML for each todo
     }
 
+    // Set up event listeners for the form
     setupEventListeners() {
-        const form = document.getElementById('todoForm');
+        const form = document.getElementById('todoForm'); // Get the form element
         form.onsubmit = (e) => {
-            e.preventDefault();
-            const input = document.getElementById('todoInput');
-            if (input.value.trim()) {
-                this.addTodo(input.value.trim());
-                input.value = '';
+            e.preventDefault(); // Prevent the default form submission
+            const input = document.getElementById('todoInput'); // Get the input element
+            if (input.value.trim()) { // Ensure the input is not empty
+                this.addTodo(input.value.trim()); // Add a new todo
+                input.value = ''; // Clear the input field
             }
         };
     }
@@ -163,5 +101,5 @@ class TodoList {
 
 // Initialize the todo list when the page loads
 document.addEventListener('DOMContentLoaded', () => {
-    window.todoList = new TodoList();
+    window.todoList = new TodoList(); // Create a new TodoList instance
 });
