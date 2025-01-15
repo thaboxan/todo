@@ -29,7 +29,6 @@ MONGODB_URI=your_mongodb_uri
 npm start
 
 # Project Structure
-
 todo-app/
 │
 ├── models/
