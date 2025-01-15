@@ -29,24 +29,7 @@ MONGODB_URI=your_mongodb_uri
 npm start
 
 # Project Structure
-todo-app/
-│
-├── models/
-│   └── Todo.js          # Mongoose model for Todo items
-│
-├── public/
-│   ├── index.html       # Main HTML file
-│   ├── style.css        # CSS styles
-│   └── script.js        # Client-side JavaScript
-│
-├── routes/
-│   └── todos.js         # Express routes for Todo API
-│
-├── .env                 # Environment variables
-├── .gitignore           # Git ignore file
-├── package.json         # npm package configuration
-├── README.md            # Project documentation
-└── server.js            # Main server file
+![alt text](image.png)
 
 # API Endpoints
 Get all todos
