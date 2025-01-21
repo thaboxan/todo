@@ -21,13 +21,15 @@ A simple Todo application built with Node.js, Express, MongoDB, and Mongoose.
       cd todo
 
 3. Install dependencies
-npm install
+  ```sh
+  npm install
 
 4. Create .env file
 MONGODB_URI=your_mongodb_uri
 
 5. Start the server
-npm start
+  ```sh
+  npm start
 
 Running the App
 Open your browser and navigate to http://localhost:3001 to see the app in action.
