@@ -29,7 +29,7 @@ MONGODB_URI=your_mongodb_uri
 
 5. Start the server
   ```sh
-   npm start
+   npm run dev
 
 Running the App
 Open your browser and navigate to http://localhost:3001 to see the app in action.
