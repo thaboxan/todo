@@ -17,7 +17,8 @@ A simple Todo application built with Node.js, Express, MongoDB, and Mongoose.
    git clone https://github.com/yourusername/todo.git
 
 2. Navigate to project directory
-    cd todo
+     ```sh
+      cd todo
 
 3. Install dependencies
 npm install
