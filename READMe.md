@@ -21,7 +21,7 @@ A simple Todo application built with Node.js, Express, MongoDB, and Mongoose.
       cd todo
 
 3. Install dependencies
-  ```sh
+    ```sh
   npm install
 
 4. Create .env file
